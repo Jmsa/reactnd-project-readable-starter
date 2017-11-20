@@ -1,13 +1,13 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux';
-import {fetchPosts, getPosts} from '../actions';
-// import Loading from "react-loading";
+import {requestPosts} from "../actions/index";
+import {bindActionCreators} from 'redux';
 import Posts from "./Posts";
 
 class App extends Component {
 
     componentDidMount() {
-        this.props.getPosts();
+        this.props.requestPosts();
     }
 
     render() {
@@ -16,6 +16,7 @@ class App extends Component {
                 <div className='nav'>
                     <h1 className='header'>Readable</h1>
                 </div>
+                <button onClick={this.props.requestPosts}></button>
                 <Posts/>
             </div>
         )
@@ -28,9 +29,15 @@ const mapStateToProps = (state, ownProps) => {
     }
 };
 
-const mapDispatchToProps = (dispatch) => {
+function mapDispatchToProps (dispatch) {
+    // return {
+    //     ...bindActionCreators({
+    //         requestPosts
+    //     }, dispatch)
+    // }
+
     return {
-        getPosts: (data) => dispatch(getPosts(data))
+        requestPosts: (data) => dispatch(requestPosts(data))
     }
 };
 

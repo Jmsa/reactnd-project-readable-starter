@@ -1,4 +1,4 @@
-import {UPDATE_POSTS} from "../actions/constants";
+import {RECEIVE_POSTS} from "../actions/constants";
 import {createObjectFromArray} from '../utils';
 
 const initialState = {
@@ -10,7 +10,7 @@ const initialState = {
 
 export function fetchPosts(state = initialState, action) {
     switch (action.type) {
-        case UPDATE_POSTS:
+        case RECEIVE_POSTS:
             return {
                 ...state,
                 posts: createObjectFromArray(action.posts)
