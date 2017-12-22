@@ -1,0 +1,14 @@
+{
+  "name": "reactnd-project-readable-starter",
+  "version": "0.0.1",
+  "dependencies": {
+
+  },
+  "devDependencies": {
+    "concurrently": "^3.5.1"
+  },
+  "scripts": {
+    "installAll": "cd api-server && yarn install && cd ../frontend && yarn install",
+    "start": "concurrently \"cd api-server && node server\" \"cd frontend && yarn start\""
+  }
+}
