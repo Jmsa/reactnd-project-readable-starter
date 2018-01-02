@@ -1,8 +1,8 @@
-import {combineReducers} from "redux";
-import {fetchPosts} from "./posts";
+// import {combineReducers} from "redux";
+import {mutateData} from "./posts";
 
 // export default combineReducers({
-//     fetchPosts,
+//     mutateData,
 // });
 
-export default fetchPosts;
+export default mutateData;

@@ -6,9 +6,12 @@ import {
     RECEIVE_POST,
     REQUEST_CATEGORIES,
     REQUEST_POSTS_FOR_CATEGORY,
-    REQUEST_POST_UPDATE
+    REQUEST_POST_UPDATE,
+    UPDATE_POST,
+    CREATE_NEW_POST,
+    REQUEST_COMMENT_DELETE
 } from '../actions/constants';
-import {POST_COMMENT, RECEIVE_COMMENTS, REQUEST_COMMENTS} from "./constants";
+import {REQUEST_POST_DELETE, POST_COMMENT, RECEIVE_COMMENTS, REQUEST_COMMENTS} from "./constants";
 
 // export const requestPosts = createAction(REQUEST_POSTS);
 
@@ -30,6 +33,34 @@ export function requestComments(action) {
     return {
         type: REQUEST_COMMENTS,
         action
+    }
+}
+
+export function updatePost(post) {
+    return {
+        type: UPDATE_POST,
+        post
+    }
+}
+
+export function deletePost(post) {
+    return {
+        type: REQUEST_POST_DELETE,
+        post
+    }
+}
+
+export function deleteComment(commentId) {
+    return {
+        type: REQUEST_COMMENT_DELETE,
+        commentId
+    }
+}
+
+export function createNewPost(post) {
+    return {
+        type: CREATE_NEW_POST,
+        post
     }
 }
 
@@ -67,12 +98,14 @@ export function requestPostsForCategory(action) {
         action
     }
 }
+
 export function requestUpdatePost(post) {
     return {
         type: REQUEST_POST_UPDATE,
         post
     }
 }
+
 export function recievePost(post) {
     return {
         type: RECEIVE_POST,

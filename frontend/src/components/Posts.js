@@ -1,15 +1,12 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {createArrayFromObject, getRandomNamedColor} from '../utils';
-import {Card, Icon, Grid} from 'semantic-ui-react';
+import {Card, Icon, Grid, Dimmer, Loader, Dropdown, Menu, Segment} from 'semantic-ui-react';
 import {requestPost, requestPostsForCategory, requestUpdatePost} from "../actions/index";
 import moment from 'moment';
 import {bindActionCreators} from 'redux';
-import {
-    // BrowserRouter as Router,
-    // Route,
-    Link
-} from 'react-router-dom'
+import {Link, Route} from 'react-router-dom';
+import {sortDirections} from '../actions/constants';
 
 // import Post from "./Post";
 const VoteTypes = {
@@ -19,16 +16,42 @@ const VoteTypes = {
 
 class Posts extends React.Component {
 
+    state = {
+        loading: true,
+        currentCategory: ''
+    };
+    // Works but only fires the first time a component mounts - not when props update.
+    // componentDidMount() {
+    //     const {category} = this.props.match.params;
+    //
+    //     // If we provided a category to start then load those posts.
+    //     if (category) {
+    //         // TODO: remove this - posts are getting called too many times - once that is fixed this isn't needed.
+    //         setTimeout(() => {
+    //             this.props.requestPostsForCategory(category);
+    //         }, 1000);
+    //     }
+    // }
 
-    componentDidMount() {
+    componentDidUpdate(previousProps, nextProps) {
         const {category} = this.props.match.params;
+        const {currentCategory, loading} = this.state;
+
+        const validCategory = category !== "all" ? category : "";
 
         // If we provided a category to start then load those posts.
-        if (category) {
-            // TODO: remove this - posts are getting called too many times - once that is fixed this isn't needed.
-            setTimeout(() => {
-                this.props.requestPostsForCategory(category);
-            }, 1000);
+        if (validCategory !== currentCategory) {
+            this.setState({currentCategory: validCategory});
+
+            // Because we start without a category if it was undefined then skip the request for posts.
+            let needToRequestPosts = typeof validCategory !== "undefined";
+            if (needToRequestPosts) {
+                setTimeout(() => {
+                    this.props.requestPostsForCategory(validCategory);
+                }, 1000);
+            }
+        } else {
+            // this.setState({loading: false});
         }
     }
 
@@ -47,21 +70,85 @@ class Posts extends React.Component {
         this.props.requestUpdatePost(currentPost);
     };
 
-    componentWillReceiveProps(nextProps) {
-        // console.group("nextProps");
-        // console.log(nextProps);
-        // console.groupEnd("nextProps");
-    }
+    handleSortClick = (e, data) => {
+        if (data.value !== this.state.postSortType) {
+            this.setState({postSortType: data.value})
+        }
+    };
 
-    cardExtras = (voteScore, id) => {
+    sortByMenu = () => {
+        const sortOptions = [
+            {name: "voteScore"},
+            {name: "timestamp"}
+        ];
+
+        let sortedOptions = sortOptions.sort((a, b) => {
+            return a.name - b.name;
+        }).map((option) => {
+            return {
+                text: option.name,
+                value: option.name,
+                // content: <Link to={`/posts/${category.name}`}>{category.name}</Link>
+            };
+        });
+
+        return (
+            <Route render={({history}) => (
+                <Dropdown
+                    item
+                    text='Sort by'
+                    selection
+                    options={sortedOptions}
+                    onChange={this.handleSortClick}
+                    defaultValue={sortedOptions[0]}
+                />
+            )}/>
+        )
+    };
+
+    categoryMenu = (categories) => {
+        if (categories.length === 0) {
+            return null;
+        }
+
+        let sortedCategoryNames = categories.sort((a, b) => {
+            return a.name - b.name;
+        }).map((category) => {
+            return {
+                text: category.name,
+                value: category.name,
+                content: <Link to={`/posts/${category.name}`}>{category.name}</Link>
+            };
+        });
+
+        sortedCategoryNames.unshift({
+            text: "all posts",
+            value: '',
+            content: <Link to={`/posts/all`}>all posts</Link>
+        });
+
+        return (
+            <Route render={({history}) => (
+                <Dropdown
+                    item
+                    text='Categories'
+                    selection
+                    search
+                    options={sortedCategoryNames}
+                />
+            )}/>
+        )
+    };
+
+    cardExtras = (voteScore, id, votedOn) => {
+        const alreadyVoted = votedOn ? VoteTypes.Decrement : VoteTypes.Increment;
         return (
             <Grid>
                 <Grid.Row columns={2}>
                     <Grid.Column>
-                        <Icon name="star"/>
+                        <Icon name={alreadyVoted ? "star" : "empty start"}
+                              onClick={(e) => this.handlePostVote(e, id, alreadyVoted)}/>
                         {voteScore}
-                        <Icon name="angle up" onClick={(e) => this.handlePostVote(e, id, VoteTypes.Increment)}/>
-                        <Icon name="angle down" onClick={(e) => this.handlePostVote(e, id, VoteTypes.Decrement)}/>
                     </Grid.Column>
                     <Grid.Column textAlign='right'>
                         <Link to={`/post/${id}`}>Read More</Link>
@@ -71,33 +158,63 @@ class Posts extends React.Component {
         )
     };
 
-    render() {
-        const {posts} = this.props;
-        const postsArray = createArrayFromObject(posts);
+    cardGroupsDisplay = (posts) => {
+
+        // Create a new array with only posts that should be shown.
+        let visiblePosts = posts.filter(post => !post.deleted);
+        let {postSortType} = this.state;
+        let cards = visiblePosts.sort((a, b) => {
+            return b[postSortType] - a[postSortType];
+        }).map((post, i) => {
+
+            post["votedOn"] = post.votedOn !== null ? post.votedOn : false;
+
+            const {title, author, body, timestamp, id, voteScore, votedOn} = post;
+            const dateOfPost = moment(parseInt(timestamp)).format('MMMM Do YYYY').toString();
+            const meta = `${author} - ${dateOfPost}`;
+
+            return <Card
+                color={getRandomNamedColor()}
+                header={title}
+                meta={meta}
+                description={body}
+                extra={this.cardExtras(voteScore, id, votedOn)}
+                id={id}
+                key={`post-${id}-${timestamp}`}
+            />
+
+        });
+
         return (
             <Card.Group itemsPerRow={3}>
-                {
-                    postsArray.sort((a, b) => {
-                        return a.voteScore - b.voteScore;
-                    }).map((post, i) => {
-
-                        const {title, author, body, timestamp, id, voteScore} = post;
-                        const dateOfPost = moment(timestamp).format('MMMM Do YYYY').toString();
-                        const meta = `${author} - ${dateOfPost}`;
-
-                        return <Card
-                            color={getRandomNamedColor()}
-                            header={title}
-                            meta={meta}
-                            description={body}
-                            extra={this.cardExtras(voteScore, id)}
-                            id={id}
-                            key={`post-${id}`}
-                        />
-
-                    })
-                }
+                {cards}
             </Card.Group>
+        )
+    };
+
+    render() {
+        const {posts, categories} = this.props;
+        const postsArray = createArrayFromObject(posts);
+        let display = this.cardGroupsDisplay(postsArray);
+        let categoryDisplay = this.categoryMenu(createArrayFromObject(categories.categories));
+        let sortDisplay = this.sortByMenu();
+
+        return (
+            <div>
+
+                <Menu attached='top'>
+                    <Menu.Item>
+                        {categoryDisplay}
+                    </Menu.Item>
+                    <Menu.Item position="right">
+                        {sortDisplay}
+                    </Menu.Item>
+                </Menu>
+
+                <Segment attached='bottom'>
+                    {display}
+                </Segment>
+            </div>
         )
     }
 }
@@ -105,7 +222,8 @@ class Posts extends React.Component {
 const mapStateToProps = (state, ownProps) => {
     return {
         posts: state.posts,
-        categories: state.categories
+        categories: state.categories,
+        postSortType: state.postSortType,
     }
 };
 

@@ -9,6 +9,6 @@
   },
   "scripts": {
     "installAll": "cd api-server && yarn install && cd ../frontend && yarn install",
-    "start": "concurrently \"cd api-server && node server\" \"cd frontend && yarn start\""
+    "start": "yarn installAll && concurrently \"cd api-server && node server\" \"cd frontend && yarn start\""
   }
 }
