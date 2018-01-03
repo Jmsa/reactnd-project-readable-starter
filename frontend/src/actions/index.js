@@ -1,4 +1,3 @@
-// import { createAction } from 'redux-actions';
 import {
     REQUEST_POSTS,
     RECEIVE_POSTS,
@@ -9,14 +8,13 @@ import {
     REQUEST_POST_UPDATE,
     UPDATE_POST,
     CREATE_NEW_POST,
-    REQUEST_COMMENT_DELETE
-} from '../actions/constants';
-import {
-    REQUEST_POST_DELETE, POST_COMMENT, RECEIVE_COMMENTS, REQUEST_COMMENTS,
+    REQUEST_COMMENT_DELETE,
+    REQUEST_POST_DELETE,
+    POST_COMMENT,
+    RECEIVE_COMMENTS,
+    REQUEST_COMMENTS,
     REQUEST_UPDATE_COMMENT
-} from "./constants";
-
-// export const requestPosts = createAction(REQUEST_POSTS);
+} from '../actions/constants';
 
 export function requestPosts(action) {
     return {

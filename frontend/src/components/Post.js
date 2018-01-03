@@ -10,51 +10,47 @@ import {VoteTypes} from './Posts';
 
 export class Post extends React.Component {
 
+    // Keep a small amount of local state
     state = {
         loading: true,
         editing: false,
         comments: []
     };
 
+    // Handle voting on a post.
     handlePostVote = (e, postId, type) => {
         e.preventDefault();
         let currentPost = this.props.post;
         currentPost.voteScore = type === VoteTypes.Increment ? currentPost.voteScore + 1 : currentPost.voteScore - 1;
         currentPost.option = type;
-
         this.props.updatePost(currentPost);
     };
 
+    // When the post loads request its details and the comments for it.
     componentDidMount() {
         const id = this.props.match.params;
         this.props.requestPost(id);
         this.props.requestComments(id);
     }
 
-    componentWillUpdate(nextProps, nextState) {
-        // console.group("next props");
-        // console.log(nextProps);
-        // console.groupEnd();
-        // console.group("next state");
-        // console.log(nextState);
-        // console.groupEnd();
-
-        // TODO: move this out - this is the wrong place for this...
+    // TODO: move this out - this is the wrong place for this...
+    componentWillUpdate() {
         if (this.state.loading) {
             this.setState({loading: false});
         }
     }
 
-    saveChanges = (event) => {
-        const {id} = this.props.post;
+    // Handle updating the post.
+    handlePostUpdate = (event) => {
         event.preventDefault();
+        const {id} = this.props.post;
 
         // Get form data
         const formData = Array.from(event.target.elements)
             .filter(el => el.name)
             .reduce((a, b) => ({...a, [b.name]: b.value}), {});
 
-        // build post
+        // Build post
         let post = {
             ...formData,
             id: id
@@ -64,93 +60,86 @@ export class Post extends React.Component {
         this.setState({editing: false})
     };
 
-    deletePost = (id) => {
+    // Handle deleting the post.
+    handleDeletePost = (id) => {
         const {history} = this.props;
         this.props.deletePost(id);
         history.push("/");
     };
 
-    // componentWillReceiveProps(nextProps) {
-    //     console.log("next props");
-    //     console.log(nextProps);
-    // }
+    // Define what a static post looks like.
+    staticPostUI = (id, title, meta, voteScore, body) => {
+        return (
+            <Item.Group>
+                <Item>
+                    <Item.Content>
+                        <Grid>
+                            <Grid.Row>
+                                <Grid.Column width={1}>
+                                    <div>
+                                        <Icon name="arrow up" onClick={(event) => {
+                                            this.handlePostVote(event, id, VoteTypes.Increment)
+                                        }}/>
+                                        <div>{voteScore}</div>
+                                        <Icon name="arrow down" onClick={(event) => {
+                                            this.handlePostVote(event, id, VoteTypes.Decrement)
+                                        }}/>
+                                    </div>
+                                </Grid.Column>
+                                <Grid.Column width={15}>
+                                    <Item.Header>
+                                        {title}
+                                    </Item.Header>
+                                    <Item.Meta>{meta}</Item.Meta>
+                                    <Item.Extra>
+                                        <span onClick={() => this.setState({editing: true})}>
+                                            <Icon name="edit"/>
+                                            Edit
+                                        </span>
+                                        <span onClick={() => this.handleDeletePost(id)}>
+                                            <Icon name="delete"/>
+                                            Delete
+                                        </span>
+                                    </Item.Extra>
+                                </Grid.Column>
+                            </Grid.Row>
+                        </Grid>
+                        <Item.Description>
+                            {body}
+                        </Item.Description>
+                    </Item.Content>
+                </Item>
+                <Comments parentId={id}/>
+            </Item.Group>
+        )
+    };
 
-    displayPost = (props) => {
+    // Define what an editing a post looks like.
+    editingPostUI = (title, body) => {
+        return (
+            <Form onSubmit={this.handlePostUpdate}>
+                <Form.Field control={Input} defaultValue={title} label="Title" name="title"
+                            placeholder="Post title..."/>
+                <Form.Field control={TextArea} defaultValue={body} label="Body" name="body"
+                            placeholder="Post content..."/>
+                <Button.Group>
+                    <Button onClick={() => this.setState({editing: false})}>Cancel</Button>
+                    <Button.Or/>
+                    <Button positive>Save</Button>
+                </Button.Group>
+            </Form>
+        )
+    };
+
+    // Define what a post looks like.
+    postUI = () => {
         const {title, author, body, timestamp, id, voteScore} = this.props.post;
         const {editing} = this.state;
-        const comments = this.props.comments;
         const dateOfPost = moment(timestamp).format('MMMM Do YYYY').toString();
         const meta = `${author} - ${dateOfPost}`;
 
-        const staticDisplay = () => {
-            return (
-                <Item.Group>
-                    <Item>
-                        <Item.Content>
-                            <Grid>
-                                <Grid.Row>
-                                    <Grid.Column width={1}>
-                                        <div>
-                                            <Icon name="arrow up" onClick={(event) => {
-                                                this.handlePostVote(event, id, VoteTypes.Increment)
-                                            }}/>
-                                            <div>{voteScore}</div>
-                                            <Icon name="arrow down" onClick={(event) => {
-                                                this.handlePostVote(event, id, VoteTypes.Decrement)
-                                            }}/>
-                                        </div>
-                                    </Grid.Column>
-                                    <Grid.Column width={15}>
-                                        <Item.Header>
-                                            {title}
-
-                                        </Item.Header>
-                                        <Item.Meta>{meta}</Item.Meta>
-                                        <Item.Extra>
-                                            <span onClick={() => {
-                                                this.setState({editing: true})
-                                            }}>
-                                            <Icon name="edit"/>
-                                                edit
-                                            </span>
-                                            <span onClick={() => {
-                                                this.deletePost(id)
-                                            }}>
-                                            <Icon name="delete"/>delete
-                                            </span>
-                                        </Item.Extra>
-                                    </Grid.Column>
-                                </Grid.Row>
-                            </Grid>
-                            <Item.Description>
-                                {body}
-                            </Item.Description>
-                        </Item.Content>
-                    </Item>
-                    <Comments parentId={id}/>
-                </Item.Group>
-            )
-        };
-
-        const editingDisplay = () => {
-            return (
-                <Form onSubmit={this.saveChanges}>
-                    <Form.Field control={Input} defaultValue={title} label="Title" name="title"
-                                placeholder="Post title..."/>
-                    <Form.Field control={TextArea} defaultValue={body} label="Body" name="body"
-                                placeholder="Post content..."/>
-                    <Button.Group>
-                        <Button onClick={() => {
-                            this.setState({editing: false})
-                        }}>Cancel</Button>
-                        <Button.Or/>
-                        <Button positive>Save</Button>
-                    </Button.Group>
-                </Form>
-            )
-        };
-
-        const display = editing ? editingDisplay() : staticDisplay();
+        // Determine which ui to show.
+        const display = editing ? this.editingPostUI(title, body) : this.staticPostUI(id, title, meta, voteScore, body);
 
         return (
             <div>
@@ -159,7 +148,8 @@ export class Post extends React.Component {
         )
     };
 
-    displayLoading = () => {
+    // Define a what loading looks like.
+    loadingUI = () => {
         return (
             <Dimmer active inverted>
                 <Loader size='large'>Loading</Loader>
@@ -172,9 +162,9 @@ export class Post extends React.Component {
         let display = null;
 
         if (loading) {
-            display = this.displayLoading();
+            display = this.loadingUI();
         } else {
-            display = this.displayPost(this.props.post);
+            display = this.postUI();
         }
 
         return (
@@ -183,7 +173,7 @@ export class Post extends React.Component {
     }
 }
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
     return {
         post: state.currentPost,
         comments: state.comments

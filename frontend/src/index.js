@@ -7,8 +7,7 @@ import {createStore, applyMiddleware, compose} from "redux";
 import reducer from "./reducers";
 import {Provider} from "react-redux";
 import createSagaMiddleware from 'redux-saga';
-import rootSaga from "./sagas";
-import {sortDirections} from './actions/constants';
+import rootSaga from "./sagas/index";
 
 const logger = store => next => action => {
     console.group(action.type);
@@ -20,9 +19,6 @@ const logger = store => next => action => {
 };
 const sagaMiddleware = createSagaMiddleware();
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-
-
-const sortType = {};
 
 const initialState = {
     loading: false,
@@ -40,11 +36,6 @@ let store = createStore(
         applyMiddleware(sagaMiddleware, logger)
     ));
 
-// let store = createStore(
-//     reducer,
-//     initialState,
-//     applyMiddleware(sagaMiddleware)
-// );
 sagaMiddleware.run(rootSaga);
 
 ReactDOM.render(

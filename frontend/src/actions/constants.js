@@ -19,6 +19,7 @@ export const REQUEST_POSTS_FOR_CATEGORY = "REQUEST_POSTS_FOR_CATEGORY";
 export const REQUEST_POST_UPDATE = "REQUEST_POST_UPDATE";
 export const REQUEST_POSTS = "REQUEST_POSTS";
 
+// TODO: consider moving this out.
 export const sortDirections = {
     Ascending: 'asc',
     Descending: 'dsc'

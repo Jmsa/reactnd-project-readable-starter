@@ -8,11 +8,13 @@ import {bindActionCreators} from 'redux';
 
 export class Comments extends React.Component {
 
+    // Maintain some limited local state.
     state = {
         editingComment: false
     };
 
-    handlePostSubmit = (event, data) => {
+    // Handle adding a comment.
+    handleAddComment = (event) => {
         event.preventDefault();
 
         // Get form data
@@ -20,7 +22,7 @@ export class Comments extends React.Component {
             .filter(el => el.name)
             .reduce((a, b) => ({...a, [b.name]: b.value}), {});
 
-        // build post
+        // Build post.
         let post = {
             ...formData,
             parentId: event.target.getAttribute("parentId"),
@@ -28,34 +30,38 @@ export class Comments extends React.Component {
             timestamp: moment().format()
         };
 
+        // Call action.
         this.props.postComment(post);
     };
 
-    handleUpdateSubmit = (event, data) => {
+    // Handle updating a comment.
+    handleCommentUpdate = (event, data) => {
         event.preventDefault();
 
-        // Get form data
+        // Get form data.
         const formData = Array.from(event.target.elements)
             .filter(el => el.name)
             .reduce((a, b) => ({...a, [b.name]: b.value}), {});
 
-        // build post
+        // Build post.
         let post = {
             ...formData,
             id: data.id,
             timestamp: moment().format()
         };
 
-        // Update the comment and close the edit form
+        // Update the comment and close the edit form.
+        // TODO: the timeout is hacky - replace it.
         this.props.updateComment(post);
         setTimeout(() => {
             this.setState({editingComment: null});
         }, 500);
     };
 
-    editingCommentForm = (id, author = "anonymous", comment = "") => {
+    // Define what a comment looks like when editing.
+    editingCommentUI = (id, author = "anonymous", comment = "") => {
         return (
-            <Form onSubmit={this.handleUpdateSubmit} id={id}>
+            <Form onSubmit={this.handleCommentUpdate} id={id}>
                 <Form.Field style={{display: 'none'}} control={Input} defaultValue={author} name="author"/>
                 <Form.Field control={TextArea} defaultValue={comment} label="Comment" name="body"
                             placeholder="Comment..."/>
@@ -70,63 +76,39 @@ export class Comments extends React.Component {
         )
     };
 
-    // Define what a comment should look like.
-    commentDisplay = (comment) => {
-        const {editingComment} = this.state;
-        let commentDate = moment(comment.timestamp).format("MM/DD/YYYY hh:mm a");
-        const deleteClick = () => {
-            this.props.deleteComment(comment.id);
-        };
-        const editClick = () => {
-            this.setState({editingComment: comment.id});
-        };
-
-        // Define static or non-editing comment ui.
-        const staticCommentUI = (comment) => {
-            return (
-                <Comment key={`comment-${comment.id}`}>
-                    <Comment.Avatar src='https://react.semantic-ui.com/assets/images/wireframe/image.png'/>
-                    <Comment.Content>
-                        <Comment.Author>{comment.author} </Comment.Author>
-                        <Comment.Metadata>
-                            <div>{commentDate}</div>
-                        </Comment.Metadata>
-                        <Comment.Text>
-                            {comment.body}
-                        </Comment.Text>
-                        <Comment.Actions>
-                            <Comment.Action onClick={editClick}>
-                                <Icon name='edit'/>
-                                Edit
-                            </Comment.Action>
-                            <Comment.Action onClick={deleteClick}>
-                                <Icon name='delete'/>
-                                Delete
-                            </Comment.Action>
-                        </Comment.Actions>
-                    </Comment.Content>
-                </Comment>
-            )
-        };
-
-        // Determine which comment ui should be shown.
-        let commentUI = null;
-        const editUI = this.editingCommentForm(comment.id, comment.author, comment.body);
-        const staticUI = staticCommentUI(comment);
-        if (editingComment === comment.id) {
-            commentUI = editUI;
-        } else {
-            commentUI = staticUI
-        }
-
+    // Define what a static comment looks like.
+    staticCommentUI = (comment, commentDate, deleteClick, editClick) => {
         return (
-            commentUI
+            <Comment key={`comment-${comment.id}`}>
+                <Comment.Avatar src='https://react.semantic-ui.com/assets/images/wireframe/image.png'/>
+                <Comment.Content>
+                    <Comment.Author>{comment.author} </Comment.Author>
+                    <Comment.Metadata>
+                        <div>{commentDate}</div>
+                    </Comment.Metadata>
+                    <Comment.Text>
+                        {comment.body}
+                    </Comment.Text>
+                    <Comment.Actions>
+                        <Comment.Action onClick={editClick}>
+                            <Icon name='edit'/>
+                            Edit
+                        </Comment.Action>
+                        <Comment.Action onClick={deleteClick}>
+                            <Icon name='delete'/>
+                            Delete
+                        </Comment.Action>
+                    </Comment.Actions>
+                </Comment.Content>
+            </Comment>
         )
     };
 
-    commentForm = (parentId, author = "anonymous", comment = "") => {
+    // Define what a comment form looks like.
+    // This is used for both adding and editing a comment.
+    addCommentUI = (parentId, author = "anonymous", comment = "") => {
         return (
-            <Form onSubmit={this.handlePostSubmit} parentid={parentId}>
+            <Form onSubmit={this.handleAddComment} parentid={parentId}>
                 <Form.Field control={Input} defaultValue={author} label="Author" name="author"
                             placeholder="Author name"/>
                 <Form.Field control={TextArea} defaultValue={comment} label="Comment" name="body"
@@ -136,39 +118,61 @@ export class Comments extends React.Component {
         )
     };
 
-    render() {
+    // Define what a comment should look like.
+    commentUI = (comment) => {
+        const {editingComment} = this.state;
 
+        // Determine which comment ui should be shown.
+        let commentUI = null;
+        if (editingComment === comment.id) {
+            commentUI = this.editingCommentUI(comment.id, comment.author, comment.body);
+        } else {
+
+            // Define some basic pieces for a comment.
+            const commentDate = moment(comment.timestamp).format("MM/DD/YYYY hh:mm a");
+            const deleteClick = () => this.props.deleteComment(comment.id);
+            const editClick = () => this.setState({editingComment: comment.id});
+            commentUI = this.staticCommentUI(comment, commentDate, deleteClick, editClick);
+        }
+        return (
+            commentUI
+        )
+    };
+
+    render() {
         const {comments, parentId} = this.props;
+
+        // Convert comments, sort them, and build the comments display.
         const commentsArray = createArrayFromObject(comments);
         const commentsDisplay = commentsArray.sort((a, b) => {
 
             // Use moment's diff util to determine the difference between dates.
             // This could be done without moment but if we start passing around formatted dates then this means we won't have to update.
-            // TODO: consider refactoring.
             let firstDate = moment(a.timestamp);
             let secondDate = moment(b.timestamp);
             return firstDate.diff(secondDate) < 0;
         }).map(((comment) => {
-            comment['editing'] = false;
             return (
+                // There is an extra key set here to make react happy.
                 <div key={`comment-wrapper-${comment.id}`}>
-                    {this.commentDisplay(comment)}
+                    {this.commentUI(comment)}
                     <Divider />
                 </div>
             )
         }));
 
+        // Finally return the entire comments display.
         return (
             <Comment.Group>
                 <Header as='h3' dividing>Comments ({commentsArray.length})</Header>
                 {commentsDisplay}
-                {this.commentForm(parentId)}
+                {this.addCommentUI(parentId)}
             </Comment.Group>
         )
     }
 }
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
     return {
         post: state.currentPost,
         editingComment: state.editingComment,

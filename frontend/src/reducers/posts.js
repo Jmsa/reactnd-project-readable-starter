@@ -3,13 +3,10 @@ import {
     RECEIVE_POST,
     RECEIVE_COMMENTS,
     RECEIVE_CATEGORIES,
-    REQUEST_POST_DELETE,
     RECEIVE_DELETED_POSTS,
-    REQUEST_COMMENT_DELETE,
     RECIEVE_COMMENT_DELETED, RECEIVE_UPDATED_COMMENT
 } from "../actions/constants";
 import {createObjectFromArray} from '../utils';
-import {createArrayFromObject} from "../utils/index";
 
 export function mutateData(state = {}, action) {
     switch (action.type) {
