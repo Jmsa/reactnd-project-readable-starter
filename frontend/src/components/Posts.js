@@ -9,7 +9,7 @@ import {Link, Route} from 'react-router-dom';
 import {sortDirections} from '../actions/constants';
 
 // import Post from "./Post";
-const VoteTypes = {
+export const VoteTypes = {
     Increment: 'upVote',
     Decrement: 'downVote'
 };
@@ -100,7 +100,6 @@ class Posts extends React.Component {
                     selection
                     options={sortedOptions}
                     onChange={this.handleSortClick}
-                    defaultValue={sortedOptions[0]}
                 />
             )}/>
         )
@@ -144,14 +143,11 @@ class Posts extends React.Component {
         const alreadyVoted = votedOn ? VoteTypes.Decrement : VoteTypes.Increment;
         return (
             <Grid>
-                <Grid.Row columns={2}>
+                <Grid.Row columns={1}>
                     <Grid.Column>
                         <Icon name={alreadyVoted ? "star" : "empty start"}
                               onClick={(e) => this.handlePostVote(e, id, alreadyVoted)}/>
                         {voteScore}
-                    </Grid.Column>
-                    <Grid.Column textAlign='right'>
-                        <Link to={`/post/${id}`}>Read More</Link>
                     </Grid.Column>
                 </Grid.Row>
             </Grid>
@@ -172,10 +168,13 @@ class Posts extends React.Component {
             const {title, author, body, timestamp, id, voteScore, votedOn} = post;
             const dateOfPost = moment(parseInt(timestamp)).format('MMMM Do YYYY').toString();
             const meta = `${author} - ${dateOfPost}`;
+            const header = () => {
+                return <Link to={`/post/${id}`}>{title}</Link>
+            };
 
             return <Card
                 color={getRandomNamedColor()}
-                header={title}
+                header={header()}
                 meta={meta}
                 description={body}
                 extra={this.cardExtras(voteScore, id, votedOn)}

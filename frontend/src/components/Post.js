@@ -1,11 +1,12 @@
 import React from 'react';
 import moment from 'moment';
-import {Item, Dimmer, Loader, Form, Input, TextArea, Button, Icon} from 'semantic-ui-react';
+import {Item, Dimmer, Loader, Form, Input, TextArea, Button, Icon, Grid} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {requestPost, requestComments, updatePost, deletePost} from '../actions/index';
 import Comments from './Comments';
 import {withRouter} from 'react-router'
+import {VoteTypes} from './Posts';
 
 export class Post extends React.Component {
 
@@ -13,6 +14,15 @@ export class Post extends React.Component {
         loading: true,
         editing: false,
         comments: []
+    };
+
+    handlePostVote = (e, postId, type) => {
+        e.preventDefault();
+        let currentPost = this.props.post;
+        currentPost.voteScore = type === VoteTypes.Increment ? currentPost.voteScore + 1 : currentPost.voteScore - 1;
+        currentPost.option = type;
+
+        this.props.updatePost(currentPost);
     };
 
     componentDidMount() {
@@ -77,27 +87,47 @@ export class Post extends React.Component {
                 <Item.Group>
                     <Item>
                         <Item.Content>
-                            <div>
-                                <Icon name="arrow up"/>
-                                <div>{voteScore}</div>
-                                <Icon name="arrow down"/>
-                            </div>
-                            <Item.Header>
-                                {title}
-                                <Icon name="edit" onClick={() => {
-                                    this.setState({editing: true})
-                                }}/>
-                                <Icon name="delete" onClick={() => {
-                                    this.deletePost(id)
-                                }}/>
-                            </Item.Header>
-                            <Item.Meta>{meta}</Item.Meta>
+                            <Grid>
+                                <Grid.Row>
+                                    <Grid.Column width={1}>
+                                        <div>
+                                            <Icon name="arrow up" onClick={(event) => {
+                                                this.handlePostVote(event, id, VoteTypes.Increment)
+                                            }}/>
+                                            <div>{voteScore}</div>
+                                            <Icon name="arrow down" onClick={(event) => {
+                                                this.handlePostVote(event, id, VoteTypes.Decrement)
+                                            }}/>
+                                        </div>
+                                    </Grid.Column>
+                                    <Grid.Column width={15}>
+                                        <Item.Header>
+                                            {title}
+
+                                        </Item.Header>
+                                        <Item.Meta>{meta}</Item.Meta>
+                                        <Item.Extra>
+                                            <span onClick={() => {
+                                                this.setState({editing: true})
+                                            }}>
+                                            <Icon name="edit"/>
+                                                edit
+                                            </span>
+                                            <span onClick={() => {
+                                                this.deletePost(id)
+                                            }}>
+                                            <Icon name="delete"/>delete
+                                            </span>
+                                        </Item.Extra>
+                                    </Grid.Column>
+                                </Grid.Row>
+                            </Grid>
                             <Item.Description>
                                 {body}
                             </Item.Description>
                         </Item.Content>
                     </Item>
-                    <Comments parentId={id} comments={comments}/>
+                    <Comments parentId={id}/>
                 </Item.Group>
             )
         };
@@ -120,7 +150,7 @@ export class Post extends React.Component {
             )
         };
 
-        const display = editing ? editingDisplay() : staticDisplay()
+        const display = editing ? editingDisplay() : staticDisplay();
 
         return (
             <div>

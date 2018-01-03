@@ -6,7 +6,7 @@ import {
     REQUEST_POST_DELETE,
     RECEIVE_DELETED_POSTS,
     REQUEST_COMMENT_DELETE,
-    RECIEVE_COMMENT_DELETED
+    RECIEVE_COMMENT_DELETED, RECEIVE_UPDATED_COMMENT
 } from "../actions/constants";
 import {createObjectFromArray} from '../utils';
 import {createArrayFromObject} from "../utils/index";
@@ -24,7 +24,7 @@ export function mutateData(state = {}, action) {
                 posts: createObjectFromArray(action.result.data)
             };
         case RECIEVE_COMMENT_DELETED:
-            const newComments = state.comments;
+            let newComments = state.comments;
             delete newComments[action.result.data.id];
             return {
                 ...state,
@@ -46,11 +46,19 @@ export function mutateData(state = {}, action) {
                 categories: action.result.data
             };
         case RECEIVE_DELETED_POSTS:
-            const activePosts = state.posts;
+            let activePosts = state.posts;
             delete activePosts[action.result.data.id];
             return {
                 ...state,
                 posts: activePosts
+            };
+        case RECEIVE_UPDATED_COMMENT:
+            let updatedComments = state.comments;
+            updatedComments[action.result.data.id] = action.result.data;
+            return {
+                ...state,
+                comments: updatedComments,
+                editingComment: null
             };
         default:
             return state;

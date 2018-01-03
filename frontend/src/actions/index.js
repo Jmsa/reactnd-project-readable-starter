@@ -11,7 +11,10 @@ import {
     CREATE_NEW_POST,
     REQUEST_COMMENT_DELETE
 } from '../actions/constants';
-import {REQUEST_POST_DELETE, POST_COMMENT, RECEIVE_COMMENTS, REQUEST_COMMENTS} from "./constants";
+import {
+    REQUEST_POST_DELETE, POST_COMMENT, RECEIVE_COMMENTS, REQUEST_COMMENTS,
+    REQUEST_UPDATE_COMMENT
+} from "./constants";
 
 // export const requestPosts = createAction(REQUEST_POSTS);
 
@@ -74,6 +77,13 @@ export function requestCategories(action) {
 export function postComment(action) {
     return {
         type: POST_COMMENT,
+        action
+    }
+}
+
+export function updateComment(action) {
+    return {
+        type: REQUEST_UPDATE_COMMENT,
         action
     }
 }

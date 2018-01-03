@@ -14,7 +14,11 @@ import {
     UPDATE_POST,
     CREATE_NEW_POST,
     REQUEST_POST_DELETE,
-    RECEIVE_DELETED_POSTS, RECIEVE_COMMENT_DELETED, REQUEST_COMMENT_DELETE
+    RECEIVE_DELETED_POSTS,
+    RECIEVE_COMMENT_DELETED,
+    REQUEST_COMMENT_DELETE,
+    RECEIVE_UPDATED_COMMENT,
+    REQUEST_UPDATE_COMMENT
 } from './actions/constants';
 import {call, put, takeEvery, fork, takeLatest} from 'redux-saga/effects';
 import axios from 'axios';
@@ -184,6 +188,41 @@ export function* postCommentCall(action) {
 
 export function* postCommentSaga() {
     yield takeEvery(POST_COMMENT, postCommentCall);
+}
+
+// update a comment
+
+// PUT /comments/:id
+// USAGE:
+//     Edit the details of an existing comment
+//
+// PARAMS:
+//     timestamp: timestamp. Get this however you want.
+//     body: String
+function updateComment(data) {
+    return axios({
+        method: 'put',
+        data: data,
+        url: `${API_URL}/comments/${data.id}`,
+        headers: {'Authorization': '1'}
+    }).catch(error => console.log(error));
+}
+
+export function* updateCommentCall(action) {
+    try {
+        const result = yield call(updateComment, action.action);
+        yield put({
+            type: RECEIVE_UPDATED_COMMENT,
+            result
+        });
+    }
+    catch (e) {
+        console.log(e);
+    }
+}
+
+export function* updateCommentSaga() {
+    yield takeEvery(REQUEST_UPDATE_COMMENT, updateCommentCall);
 }
 
 // get all categories
@@ -367,5 +406,6 @@ export default function* rootSaga() {
         fork(createNewPostSaga),
         fork(deletePostSaga),
         fork(deleteCommentSaga),
+        fork(updateCommentSaga),
     ]
 }

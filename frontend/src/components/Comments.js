@@ -3,7 +3,7 @@ import moment from 'moment';
 import {Form, Comment, Header, Button, Icon, Divider, Input, TextArea} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {createArrayFromObject, generateGuid} from '../utils';
-import {postComment, deleteComment} from '../actions/index';
+import {postComment, deleteComment, updateComment} from '../actions/index';
 import {bindActionCreators} from 'redux';
 
 export class Comments extends React.Component {
@@ -12,7 +12,7 @@ export class Comments extends React.Component {
         editingComment: false
     };
 
-    handleSubmit = (event, data) => {
+    handlePostSubmit = (event, data) => {
         event.preventDefault();
 
         // Get form data
@@ -31,16 +31,37 @@ export class Comments extends React.Component {
         this.props.postComment(post);
     };
 
-    editingCommentForm = (parentId, author = "anonymous", comment = "", exposeCancelOption = false) => {
+    handleUpdateSubmit = (event, data) => {
+        event.preventDefault();
+
+        // Get form data
+        const formData = Array.from(event.target.elements)
+            .filter(el => el.name)
+            .reduce((a, b) => ({...a, [b.name]: b.value}), {});
+
+        // build post
+        let post = {
+            ...formData,
+            id: data.id,
+            timestamp: moment().format()
+        };
+
+        // Update the comment and close the edit form
+        this.props.updateComment(post);
+        setTimeout(() => {
+            this.setState({editingComment: null});
+        }, 500);
+    };
+
+    editingCommentForm = (id, author = "anonymous", comment = "") => {
         return (
-            <Form onSubmit={this.handleSubmit} parentId={parentId}>
-                <Form.Field control={Input} defaultValue={author} label="Author" name="author"
-                            placeholder="Author name"/>
+            <Form onSubmit={this.handleUpdateSubmit} id={id}>
+                <Form.Field style={{display: 'none'}} control={Input} defaultValue={author} name="author"/>
                 <Form.Field control={TextArea} defaultValue={comment} label="Comment" name="body"
                             placeholder="Comment..."/>
                 <Button.Group>
                     <Button content='Cancel' onClick={() => {
-                        this.setState({editingComment: false})
+                        this.setState({editingComment: null})
                     }}/>
                     <Button.Or/>
                     <Button content='UpdateComment'/>
@@ -57,14 +78,13 @@ export class Comments extends React.Component {
             this.props.deleteComment(comment.id);
         };
         const editClick = () => {
-            // comment.editing = true;
             this.setState({editingComment: comment.id});
         };
 
         // Define static or non-editing comment ui.
         const staticCommentUI = (comment) => {
             return (
-                <Comment key={`comment-${comment.timestamp}`}>
+                <Comment key={`comment-${comment.id}`}>
                     <Comment.Avatar src='https://react.semantic-ui.com/assets/images/wireframe/image.png'/>
                     <Comment.Content>
                         <Comment.Author>{comment.author} </Comment.Author>
@@ -91,7 +111,7 @@ export class Comments extends React.Component {
 
         // Determine which comment ui should be shown.
         let commentUI = null;
-        const editUI = this.commentForm(comment.parentId);
+        const editUI = this.editingCommentForm(comment.id, comment.author, comment.body);
         const staticUI = staticCommentUI(comment);
         if (editingComment === comment.id) {
             commentUI = editUI;
@@ -104,10 +124,9 @@ export class Comments extends React.Component {
         )
     };
 
-    commentForm = (parentId, author = "anonymous", comment = "", exposeCancelOption = false) => {
-
+    commentForm = (parentId, author = "anonymous", comment = "") => {
         return (
-            <Form onSubmit={this.handleSubmit} parentId={parentId}>
+            <Form onSubmit={this.handlePostSubmit} parentid={parentId}>
                 <Form.Field control={Input} defaultValue={author} label="Author" name="author"
                             placeholder="Author name"/>
                 <Form.Field control={TextArea} defaultValue={comment} label="Comment" name="body"
@@ -130,9 +149,12 @@ export class Comments extends React.Component {
             let secondDate = moment(b.timestamp);
             return firstDate.diff(secondDate) < 0;
         }).map(((comment) => {
-            comment.editing = false;
+            comment['editing'] = false;
             return (
-                this.commentDisplay(comment)
+                <div key={`comment-wrapper-${comment.id}`}>
+                    {this.commentDisplay(comment)}
+                    <Divider />
+                </div>
             )
         }));
 
@@ -140,7 +162,6 @@ export class Comments extends React.Component {
             <Comment.Group>
                 <Header as='h3' dividing>Comments ({commentsArray.length})</Header>
                 {commentsDisplay}
-                <Divider/>
                 {this.commentForm(parentId)}
             </Comment.Group>
         )
@@ -150,7 +171,8 @@ export class Comments extends React.Component {
 const mapStateToProps = (state, ownProps) => {
     return {
         post: state.currentPost,
-        editingComment: state.editingComment
+        editingComment: state.editingComment,
+        comments: state.comments
     }
 };
 
@@ -158,6 +180,7 @@ const mapDispatchToProps = (dispatch) => {
     return {
         ...bindActionCreators({
             postComment,
+            updateComment,
             deleteComment
         }, dispatch)
     }
