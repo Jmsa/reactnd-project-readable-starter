@@ -1,22 +1,16 @@
-# Readable API Server
+## Readable Project Installation and Running
+* Clone project `git clone https://github.com/Jmsa/reactnd-project-readable-starter`
+* Install and run the server and frontend by running `yarn start` in the root.
+    * This will install both server and frontend dependencies and start the server and frontend.
 
-This is the starter project for the final assessment project for Udacity's Redux course where you will build a content and comment web app. Users will be able to post content to predefined categories, comment on their posts and other users' posts, and vote on posts and comments. Users will also be able to edit and delete posts and comments.
-
-This repository includes the code for the backend API Server that you'll use to develop and interact with the front-end portion of the project.
-
-## Start Developing
-
-To get started developing right away:
-
-* Install and start the API server
-    - `cd api-server`
-    - `npm install`
-    - `node server`
-* In another terminal window, use Create React App to scaffold out the front-end
-    - `create-react-app frontend`
-    - `cd frontend`
-    - `npm start`
-
-## API Server
-
-Information about the API server and how to use it can be found in its [README file](api-server/README.md).
+## Todos
+General improvements and areas for better practice:
+* Add transitions and transition groups
+* Add validation - ensuring not just any post gets through
+* Add more loading states - like when changing category or updating a post/comment
+* Limit voting to once per session/user
+* Make sure that comments are refreshed after removal
+* Look into the all post category selection - seems buggy
+* Couple only the top level app to state - make other components stateless
+* ~~Move from thunk to redux-saga~~
+* ~~Clean up menu - because it uses Navlink + Dropdown the item with the click action doesn't take up all the space - meaning you can make a selection without getting the desired result~~
