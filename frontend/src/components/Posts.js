@@ -114,15 +114,13 @@ class Posts extends React.Component {
             return {
                 text: category.name,
                 value: category.name,
-                content: <Link to={`/posts/${category.name}`}>{category.name}</Link>
             };
         });
 
         // Add an all option to the categories.
         sortedCategoryNames.unshift({
             text: "all posts",
-            value: '',
-            // content: <Link to={`/posts/all`}>all posts</Link>
+            value: 'all',
         });
 
         return (
