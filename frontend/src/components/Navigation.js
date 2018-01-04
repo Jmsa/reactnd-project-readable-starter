@@ -4,7 +4,7 @@ import {requestPostsForCategory, requestPosts} from '../actions/posts';
 import {NavLink} from 'react-router-dom';
 import {Menu, Icon} from 'semantic-ui-react';
 
-export class Navigation extends React.Component {
+class Navigation extends React.Component {
 
     render() {
         return (

@@ -21,7 +21,7 @@ class Posts extends React.Component {
         {name: "timestamp"}
     ];
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps, prevState) {
 
         // Stash some info.
         const {category} = this.props.match.params;
@@ -33,20 +33,17 @@ class Posts extends React.Component {
             this.setState({currentCategory: validCategory});
 
             // Because we start without a category if it was undefined then skip the request for posts.
-            let needToRequestPosts = typeof validCategory !== "undefined";
-            if (needToRequestPosts) {
-                setTimeout(() => {
-                    this.props.requestPostsForCategory(validCategory);
-                }, 1000);
+            if (prevProps.currentCategory !== validCategory) {
+                this.props.requestPostsForCategory(validCategory);
             }
         }
     }
 
     // Handle editing a post
-    handleEditPost = (id) => {
+    handleEditPost = (id, category) => {
         const {history} = this.props;
         this.setState({editingPost: true});
-        history.push(`/post/${id}`);
+        history.push(`/posts/${category}/${id}`);
     };
 
     // Handle deleting a post
@@ -73,7 +70,7 @@ class Posts extends React.Component {
     // Define what sort options look like.
     sortOptionsUI = () => {
 
-        let sortOptions = this.sortOptions.sort((a, b) => {
+        const sortOptions = this.sortOptions.sort((a, b) => {
             return a.name - b.name;
         }).map((option) => {
             return {
@@ -134,7 +131,7 @@ class Posts extends React.Component {
     };
 
     //
-    cardExtras = (voteScore, id, votedOn, commentCount) => {
+    cardExtras = (voteScore, id, votedOn, commentCount, category) => {
         return (
             <Grid>
                 <Grid.Row columns={4}>
@@ -154,7 +151,7 @@ class Posts extends React.Component {
                         {commentCount}
                     </Grid.Column>
                     <Grid.Column>
-                        <Icon name='edit' title='edit' onClick={() => this.handleEditPost(id)}/>
+                        <Icon name='edit' title='edit' onClick={() => this.handleEditPost(id, category)}/>
                     </Grid.Column>
                     <Grid.Column>
                         <Icon name='delete' title='delete' onClick={() => this.handleDeletePost(id)}/>
@@ -178,7 +175,7 @@ class Posts extends React.Component {
 
         // If we are missing a piece of the post it means it doesn't actually exist anymore - return nothing.
         // These seems to happen when it has been deleted and a user navigates back.
-        if(!id || !timestamp){
+        if (!id || !timestamp) {
             return null;
         }
 
@@ -187,7 +184,7 @@ class Posts extends React.Component {
             header={header()}
             meta={meta}
             description={body}
-            extra={this.cardExtras(voteScore, id, votedOn, commentCount)}
+            extra={this.cardExtras(voteScore, id, votedOn, commentCount, category)}
             id={id}
             key={`post-${id}-${timestamp}`}
         />
@@ -197,11 +194,11 @@ class Posts extends React.Component {
     postGroupUI = (posts) => {
 
         // Create a new array with only posts that should be shown.
-        let visiblePosts = posts.filter((post) => !post.deleted);
-        let {postSortType} = this.state;
+        const visiblePosts = posts.filter((post) => !post.deleted);
+        const {postSortType} = this.state;
 
         // Loop over the posts - create a card from each.
-        let cards = visiblePosts.sort((a, b) => {
+        const cards = visiblePosts.sort((a, b) => {
             return b[postSortType] - a[postSortType];
         }).map((post) => {
             return this.postUI(post);

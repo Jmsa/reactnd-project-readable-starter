@@ -23,7 +23,7 @@ export class Comments extends React.Component {
             .reduce((a, b) => ({...a, [b.name]: b.value}), {});
 
         // Build post.
-        let post = {
+        const post = {
             ...formData,
             parentId: event.target.getAttribute("parentId"),
             id: generateGuid(),
@@ -44,18 +44,15 @@ export class Comments extends React.Component {
             .reduce((a, b) => ({...a, [b.name]: b.value}), {});
 
         // Build post.
-        let post = {
+        const post = {
             ...formData,
             id: data.id,
             timestamp: moment().format()
         };
 
         // Update the comment and close the edit form.
-        // TODO: the timeout is hacky - replace it.
         this.props.updateComment(post);
-        setTimeout(() => {
-            this.setState({editingComment: null});
-        }, 500);
+        this.setState({editingComment: false});
     };
 
     // Define what a comment looks like when editing.
@@ -67,7 +64,7 @@ export class Comments extends React.Component {
                             placeholder="Comment..."/>
                 <Button.Group>
                     <Button content='Cancel' onClick={() => {
-                        this.setState({editingComment: null})
+                        this.setState({editingComment: false})
                     }}/>
                     <Button.Or/>
                     <Button content='UpdateComment'/>
@@ -169,8 +166,8 @@ export class Comments extends React.Component {
 
             // Use moment's diff util to determine the difference between dates.
             // This could be done without moment but if we start passing around formatted dates then this means we won't have to update.
-            let firstDate = moment(a.timestamp);
-            let secondDate = moment(b.timestamp);
+            const firstDate = moment(a.timestamp);
+            const secondDate = moment(b.timestamp);
             return firstDate.diff(secondDate) < 0;
         }).map(((comment) => {
             return (
@@ -197,7 +194,7 @@ const mapStateToProps = (state) => {
     return {
         post: state.currentPost,
         editingComment: state.editingComment,
-        comments: state.comments
+        comments: Array.isArray(state.comments) ? createArrayFromObject(state.comments) : state.comments
     }
 };
 

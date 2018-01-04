@@ -20,7 +20,7 @@ export class NewPost extends React.Component {
             .reduce((a, b) => ({...a, [b.name]: b.value}), {});
 
         // Build post.
-        let post = {
+        const post = {
             ...formData,
             id: id,
             timestamp: timestamp

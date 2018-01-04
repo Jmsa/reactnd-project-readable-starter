@@ -20,7 +20,7 @@ export class Post extends React.Component {
     // Handle voting on a post.
     handlePostVote = (e, postId, type) => {
         e.preventDefault();
-        let currentPost = this.props.post;
+        const currentPost = this.props.post;
         currentPost.voteScore = type === VoteTypes.Increment ? currentPost.voteScore + 1 : currentPost.voteScore - 1;
         currentPost.option = type;
         this.props.updatePost(currentPost);
@@ -51,7 +51,7 @@ export class Post extends React.Component {
             .reduce((a, b) => ({...a, [b.name]: b.value}), {});
 
         // Build post
-        let post = {
+        const post = {
             ...formData,
             id: id
         };

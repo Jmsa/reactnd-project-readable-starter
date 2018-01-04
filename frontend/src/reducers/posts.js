@@ -21,8 +21,11 @@ export function mutateData(state = {}, action) {
                 posts: createObjectFromArray(action.result.data)
             };
         case RECIEVE_COMMENT_DELETED:
-            let newComments = state.comments;
+            let newComments = {};
+            Object.assign(newComments, state.comments);
+            newComments[action.result.data.id].deleted = true;
             delete newComments[action.result.data.id];
+
             return {
                 ...state,
                 comments: newComments
@@ -43,7 +46,8 @@ export function mutateData(state = {}, action) {
                 categories: action.result.data
             };
         case RECEIVE_DELETED_POSTS:
-            let activePosts = state.posts;
+            let activePosts = {};
+            Object.assign(activePosts, state.posts);
             activePosts[action.result.data.id].deleted = true;
             delete activePosts[action.result.data.id];
 
@@ -52,12 +56,14 @@ export function mutateData(state = {}, action) {
                 posts: activePosts
             };
         case RECEIVE_UPDATED_COMMENT:
-            let updatedComments = state.comments;
+            let updatedComments = {};
+            Object.assign(updatedComments, state.comments);
             updatedComments[action.result.data.id] = action.result.data;
+
             return {
                 ...state,
-                comments: updatedComments,
-                editingComment: null
+                editingComment: false,
+                comments: updatedComments
             };
         default:
             return state;
