@@ -2,7 +2,6 @@ import React from 'react';
 import moment from 'moment';
 import {Item, Dimmer, Loader, Form, Input, TextArea, Button, Icon, Grid} from 'semantic-ui-react';
 import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
 import {requestPost, requestComments, updatePost, deletePost} from '../actions/index';
 import Comments from './Comments';
 import {withRouter} from 'react-router'
@@ -157,19 +156,18 @@ export class Post extends React.Component {
         )
     };
 
-    render() {
+    // Define what UI should be shown.
+    ui = () => {
         const {loading} = this.state;
-        let display = null;
-
         if (loading) {
-            display = this.loadingUI();
+            return this.loadingUI();
         } else {
-            display = this.postUI();
+            return this.postUI();
         }
+    };
 
-        return (
-            display
-        )
+    render() {
+        return this.ui();
     }
 }
 
@@ -179,15 +177,5 @@ const mapStateToProps = (state) => {
         comments: state.comments
     }
 };
-const mapDispatchToProps = (dispatch) => {
-    return {
-        ...bindActionCreators({
-            requestPost,
-            requestComments,
-            updatePost,
-            deletePost
-        }, dispatch)
-    }
-};
 
-export default connect(mapStateToProps, mapDispatchToProps)(Post)
+export default connect(mapStateToProps, {requestPost, requestComments, updatePost, deletePost})(Post)
