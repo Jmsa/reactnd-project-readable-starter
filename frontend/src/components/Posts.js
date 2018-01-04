@@ -5,12 +5,8 @@ import {Card, Icon, Grid, Dropdown, Menu, Segment} from 'semantic-ui-react';
 import {requestPost, requestPostsForCategory, requestUpdatePost, deletePost} from "../actions/posts";
 import moment from 'moment';
 import {Link, Route} from 'react-router-dom';
+import {VoteTypes} from '../actions/constants';
 
-// import Post from "./Post";
-export const VoteTypes = {
-    Increment: 'upVote',
-    Decrement: 'downVote'
-};
 
 class Posts extends React.Component {
 

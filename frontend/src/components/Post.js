@@ -4,9 +4,9 @@ import {Item, Dimmer, Loader, Form, Input, TextArea, Button, Icon, Grid} from 's
 import {connect} from 'react-redux';
 import {requestPost, updatePost, deletePost} from '../actions/posts';
 import {requestComments} from '../actions/comments';
+import {VoteTypes} from '../actions/constants';
 import Comments from './Comments';
 import {withRouter} from 'react-router'
-import {VoteTypes} from './Posts';
 
 export class Post extends React.Component {
 

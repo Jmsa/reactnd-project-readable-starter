@@ -27,6 +27,7 @@ The repo is licensed under The MIT License (MIT)
 
 ## Todos
 General improvements and areas for better practice:
+* **Fix comment retrieval** - when new comments are added or voted on the ui isn't updating
 * Add transitions and transition groups
 * Add validation - ensuring not just any post gets through
 * Add more loading states - like when changing category or updating a post/comment

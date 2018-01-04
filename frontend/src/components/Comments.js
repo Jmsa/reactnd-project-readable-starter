@@ -3,7 +3,8 @@ import moment from 'moment';
 import {Form, Comment, Header, Button, Icon, Divider, Input, TextArea} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {createArrayFromObject, generateGuid} from '../utils';
-import {postComment, deleteComment, updateComment} from '../actions/comments';
+import {postComment, deleteComment, updateComment, requestComments} from '../actions/comments';
+import {VoteTypes} from '../actions/constants';
 
 export class Comments extends React.Component {
 
@@ -76,17 +77,18 @@ export class Comments extends React.Component {
     };
 
     // Define what a static comment looks like.
-    staticCommentUI = (comment, commentDate, deleteClick, editClick) => {
+    staticCommentUI = (comment, commentDate, deleteClick, editClick, handleCommentVote) => {
+        const {id, author, body, voteScore,} = comment;
         return (
-            <Comment key={`comment-${comment.id}`}>
+            <Comment key={`comment-${id}`}>
                 <Comment.Avatar src='https://react.semantic-ui.com/assets/images/wireframe/image.png'/>
                 <Comment.Content>
-                    <Comment.Author>{comment.author} </Comment.Author>
+                    <Comment.Author>{author} </Comment.Author>
                     <Comment.Metadata>
                         <div>{commentDate}</div>
                     </Comment.Metadata>
                     <Comment.Text>
-                        {comment.body}
+                        {body}
                     </Comment.Text>
                     <Comment.Actions>
                         <Comment.Action onClick={editClick}>
@@ -96,6 +98,15 @@ export class Comments extends React.Component {
                         <Comment.Action onClick={deleteClick}>
                             <Icon name='delete'/>
                             Delete
+                        </Comment.Action>
+                        <Comment.Action onClick={(event) => handleCommentVote(event, VoteTypes.Increment)}>
+                            <Icon name='arrow up'/>
+                        </Comment.Action>
+                        <Comment.Action>
+                            {voteScore}
+                        </Comment.Action>
+                        <Comment.Action onClick={(event) => handleCommentVote(event, VoteTypes.Decrement)}>
+                            <Icon name='arrow down'/>
                         </Comment.Action>
                     </Comment.Actions>
                 </Comment.Content>
@@ -120,18 +131,29 @@ export class Comments extends React.Component {
     // Define what a comment should look like.
     commentUI = (comment) => {
         const {editingComment} = this.state;
+        const {id, author, body, timestamp, voteScore, parentId} = comment;
 
         // Determine which comment ui should be shown.
         let commentUI = null;
-        if (editingComment === comment.id) {
-            commentUI = this.editingCommentUI(comment.id, comment.author, comment.body);
+        if (editingComment === id) {
+            commentUI = this.editingCommentUI(id, author, body);
         } else {
 
             // Define some basic pieces for a comment.
-            const commentDate = moment(comment.timestamp).format("MM/DD/YYYY hh:mm a");
-            const deleteClick = () => this.props.deleteComment(comment.id);
-            const editClick = () => this.setState({editingComment: comment.id});
-            commentUI = this.staticCommentUI(comment, commentDate, deleteClick, editClick);
+            const commentDate = moment(timestamp).format("MM/DD/YYYY hh:mm a");
+            const deleteClick = () => this.props.deleteComment(id);
+            const editClick = () => this.setState({editingComment: id});
+            const handleCommentVote = (e, type) => {
+                e.preventDefault();
+                let currentComment = comment;
+                currentComment.voteScore = type === VoteTypes.Increment ? currentComment.voteScore + 1 : currentComment.voteScore - 1;
+                this.props.updateComment(currentComment);
+                // setTimeout(() => {
+                //     this.props.requestComments(parentId);
+                // }, 1000);
+            };
+
+            commentUI = this.staticCommentUI(comment, commentDate, deleteClick, editClick, handleCommentVote);
         }
         return (
             commentUI
@@ -155,7 +177,7 @@ export class Comments extends React.Component {
                 // There is an extra key set here to make react happy.
                 <div key={`comment-wrapper-${comment.id}`}>
                     {this.commentUI(comment)}
-                    <Divider />
+                    <Divider/>
                 </div>
             )
         }));
@@ -179,4 +201,4 @@ const mapStateToProps = (state) => {
     }
 };
 
-export default connect(mapStateToProps, {postComment, updateComment, deleteComment})(Comments)
+export default connect(mapStateToProps, {postComment, updateComment, deleteComment, requestComments})(Comments)

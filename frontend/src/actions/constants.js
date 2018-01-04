@@ -24,3 +24,8 @@ export const sortDirections = {
     Ascending: 'asc',
     Descending: 'dsc'
 };
+
+export const VoteTypes = {
+    Increment: 'upVote',
+    Decrement: 'downVote'
+};
