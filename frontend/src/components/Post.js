@@ -144,7 +144,7 @@ export class Post extends React.Component {
 
         // If the post doesn't exist redirect the user.
         if (!postExists) {
-            display = <Redirect to="/posts/all"/>;
+            display = <Redirect to="/notFound"/>;
         }
 
         return (

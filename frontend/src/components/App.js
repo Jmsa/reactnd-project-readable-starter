@@ -5,6 +5,7 @@ import Posts from "./Posts";
 import Post from "./Post";
 import NewPost from "./NewPost";
 import Navigation from "./Navigation";
+import NotFound from "./NotFound";
 import {BrowserRouter as Router, Route, Redirect} from 'react-router-dom';
 
 export class App extends Component {
@@ -22,6 +23,7 @@ export class App extends Component {
                     <div>
                         <Navigation/>
                         <Route path="/newPost" component={NewPost}/>
+                        <Route exact path="/notFound" component={NotFound}/>
                         <Route exact path="/posts/:category" component={Posts}/>
                         <Route exact path="/posts/:category/:id" component={Post}/>
                         <Route exact path="/" render={() => (
