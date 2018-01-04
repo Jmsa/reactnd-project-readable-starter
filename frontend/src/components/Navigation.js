@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {requestPostsForCategory, requestPosts} from '../actions/index';
+import {requestPostsForCategory, requestPosts} from '../actions/posts';
 import {NavLink} from 'react-router-dom';
 import {Menu, Icon} from 'semantic-ui-react';
 

@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import {Form, Input, TextArea, Button} from 'semantic-ui-react';
 import {connect} from 'react-redux';
-import {createNewPost} from '../actions/index';
+import {createNewPost} from '../actions/posts';
 import {generateGuid, createArrayFromObject} from "../utils/index";
 import {withRouter} from 'react-router'
 

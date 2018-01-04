@@ -3,7 +3,7 @@ import moment from 'moment';
 import {Form, Comment, Header, Button, Icon, Divider, Input, TextArea} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {createArrayFromObject, generateGuid} from '../utils';
-import {postComment, deleteComment, updateComment} from '../actions/index';
+import {postComment, deleteComment, updateComment} from '../actions/comments';
 
 export class Comments extends React.Component {
 

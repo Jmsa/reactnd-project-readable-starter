@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {createArrayFromObject, getRandomNamedColor} from '../utils';
 import {Card, Icon, Grid, Dropdown, Menu, Segment} from 'semantic-ui-react';
-import {requestPost, requestPostsForCategory, requestUpdatePost} from "../actions/index";
+import {requestPost, requestPostsForCategory, requestUpdatePost} from "../actions/posts";
 import moment from 'moment';
 import {Link, Route} from 'react-router-dom';
 

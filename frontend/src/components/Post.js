@@ -2,7 +2,8 @@ import React from 'react';
 import moment from 'moment';
 import {Item, Dimmer, Loader, Form, Input, TextArea, Button, Icon, Grid} from 'semantic-ui-react';
 import {connect} from 'react-redux';
-import {requestPost, requestComments, updatePost, deletePost} from '../actions/index';
+import {requestPost, updatePost, deletePost} from '../actions/posts';
+import {requestComments} from '../actions/comments';
 import Comments from './Comments';
 import {withRouter} from 'react-router'
 import {VoteTypes} from './Posts';

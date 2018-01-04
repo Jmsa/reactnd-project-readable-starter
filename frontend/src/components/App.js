@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux';
-import {requestPosts, requestCategories} from "../actions/index";
+import {requestPosts, requestCategories} from "../actions/posts";
 import Posts from "./Posts";
 import Post from "./Post";
 import NewPost from "./NewPost";
