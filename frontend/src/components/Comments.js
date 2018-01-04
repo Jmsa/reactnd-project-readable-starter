@@ -131,7 +131,7 @@ export class Comments extends React.Component {
     // Define what a comment should look like.
     commentUI = (comment) => {
         const {editingComment} = this.state;
-        const {id, author, body, timestamp, voteScore, parentId} = comment;
+        const {id, author, body, timestamp} = comment;
 
         // Determine which comment ui should be shown.
         let commentUI = null;

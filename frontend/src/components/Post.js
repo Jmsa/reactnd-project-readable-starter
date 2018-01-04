@@ -6,6 +6,7 @@ import {requestPost, updatePost, deletePost} from '../actions/posts';
 import {requestComments} from '../actions/comments';
 import {VoteTypes} from '../actions/constants';
 import Comments from './Comments';
+import {Redirect} from 'react-router';
 import {withRouter} from 'react-router'
 
 export class Post extends React.Component {
@@ -136,9 +137,15 @@ export class Post extends React.Component {
         const {editingPost} = this.state;
         const dateOfPost = moment(timestamp).format('MMMM Do YYYY').toString();
         const meta = `${author} - ${dateOfPost}`;
+        const postExists = !!id;
 
         // Determine which ui to show.
-        const display = editingPost ? this.editingPostUI(title, body) : this.staticPostUI(id, title, meta, voteScore, body);
+        let display = editingPost ? this.editingPostUI(title, body) : this.staticPostUI(id, title, meta, voteScore, body);
+
+        // If the post doesn't exist redirect the user.
+        if (!postExists) {
+            display = <Redirect to="/posts/all"/>;
+        }
 
         return (
             <div>

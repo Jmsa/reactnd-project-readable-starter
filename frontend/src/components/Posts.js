@@ -135,7 +135,6 @@ class Posts extends React.Component {
 
     //
     cardExtras = (voteScore, id, votedOn, commentCount) => {
-        const alreadyVoted = votedOn ? VoteTypes.Decrement : VoteTypes.Increment;
         return (
             <Grid>
                 <Grid.Row columns={4}>
@@ -177,6 +176,12 @@ class Posts extends React.Component {
         const meta = `${author} - ${dateOfPost}`;
         const header = () => <Link to={`/posts/${category}/${id}`}>{title}</Link>;
 
+        // If we are missing a piece of the post it means it doesn't actually exist anymore - return nothing.
+        // These seems to happen when it has been deleted and a user navigates back.
+        if(!id || !timestamp){
+            return null;
+        }
+
         return <Card
             color={getRandomNamedColor()}
             header={header()}
@@ -192,7 +197,7 @@ class Posts extends React.Component {
     postGroupUI = (posts) => {
 
         // Create a new array with only posts that should be shown.
-        let visiblePosts = posts.filter(post => !post.deleted);
+        let visiblePosts = posts.filter((post) => !post.deleted);
         let {postSortType} = this.state;
 
         // Loop over the posts - create a card from each.

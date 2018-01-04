@@ -44,7 +44,9 @@ export function mutateData(state = {}, action) {
             };
         case RECEIVE_DELETED_POSTS:
             let activePosts = state.posts;
+            activePosts[action.result.data.id].deleted = true;
             delete activePosts[action.result.data.id];
+
             return {
                 ...state,
                 posts: activePosts
