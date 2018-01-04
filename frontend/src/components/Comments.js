@@ -4,7 +4,6 @@ import {Form, Comment, Header, Button, Icon, Divider, Input, TextArea} from 'sem
 import {connect} from 'react-redux';
 import {createArrayFromObject, generateGuid} from '../utils';
 import {postComment, deleteComment, updateComment} from '../actions/index';
-import {bindActionCreators} from 'redux';
 
 export class Comments extends React.Component {
 
@@ -180,14 +179,4 @@ const mapStateToProps = (state) => {
     }
 };
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        ...bindActionCreators({
-            postComment,
-            updateComment,
-            deleteComment
-        }, dispatch)
-    }
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Comments)
+export default connect(mapStateToProps, {postComment, updateComment, deleteComment})(Comments)

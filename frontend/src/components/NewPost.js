@@ -2,7 +2,6 @@ import React from 'react';
 import moment from 'moment';
 import {Form, Input, TextArea, Button} from 'semantic-ui-react';
 import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
 import {createNewPost} from '../actions/index';
 import {generateGuid, createArrayFromObject} from "../utils/index";
 import {withRouter} from 'react-router'
@@ -68,12 +67,5 @@ const mapStateToProps = (state) => {
         categories: state.categories
     }
 };
-const mapDispatchToProps = (dispatch) => {
-    return {
-        ...bindActionCreators({
-            createNewPost
-        }, dispatch)
-    }
-};
 
-export default connect(mapStateToProps, mapDispatchToProps)(NewPost)
+export default connect(mapStateToProps, {createNewPost})(NewPost)

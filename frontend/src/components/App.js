@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux';
 import {requestPosts, requestCategories} from "../actions/index";
-import {bindActionCreators} from 'redux';
 import Posts from "./Posts";
 import Post from "./Post";
 import NewPost from "./NewPost";
@@ -42,13 +41,4 @@ const mapStateToProps = (state) => {
     }
 };
 
-function mapDispatchToProps(dispatch) {
-    return {
-        ...bindActionCreators({
-            requestPosts,
-            requestCategories
-        }, dispatch)
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default connect(mapStateToProps, {requestPosts, requestCategories})(App)

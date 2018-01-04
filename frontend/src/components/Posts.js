@@ -4,7 +4,6 @@ import {createArrayFromObject, getRandomNamedColor} from '../utils';
 import {Card, Icon, Grid, Dropdown, Menu, Segment} from 'semantic-ui-react';
 import {requestPost, requestPostsForCategory, requestUpdatePost} from "../actions/index";
 import moment from 'moment';
-import {bindActionCreators} from 'redux';
 import {Link, Route} from 'react-router-dom';
 
 // import Post from "./Post";
@@ -222,14 +221,4 @@ const mapStateToProps = (state) => {
     }
 };
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        ...bindActionCreators({
-            requestPost,
-            requestPostsForCategory,
-            requestUpdatePost
-        }, dispatch)
-    }
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Posts)
+export default connect(mapStateToProps, {requestPost, requestPostsForCategory, requestUpdatePost})(Posts)

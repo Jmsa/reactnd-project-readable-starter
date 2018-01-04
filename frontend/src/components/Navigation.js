@@ -1,7 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {requestPostsForCategory, requestPosts} from '../actions/index';
-import {bindActionCreators} from 'redux';
 import {NavLink} from 'react-router-dom';
 import {Menu, Icon} from 'semantic-ui-react';
 
@@ -34,13 +33,4 @@ const mapStateToProps = (state) => {
     }
 };
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        ...bindActionCreators({
-            requestPostsForCategory,
-            requestPosts
-        }, dispatch)
-    }
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Navigation)
+export default connect(mapStateToProps, {requestPostsForCategory, requestPosts})(Navigation)
