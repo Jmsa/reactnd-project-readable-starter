@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {createArrayFromObject, getRandomNamedColor} from '../utils';
 import {Card, Icon, Grid, Dropdown, Menu, Segment} from 'semantic-ui-react';
-import {requestPost, requestPostsForCategory, requestUpdatePost} from "../actions/posts";
+import {requestPost, requestPostsForCategory, requestUpdatePost, deletePost} from "../actions/posts";
 import moment from 'moment';
 import {Link, Route} from 'react-router-dom';
 
@@ -45,6 +45,11 @@ class Posts extends React.Component {
             }
         }
     }
+
+    // Handle deleting a post
+    handleDeletePost = (id) => {
+        this.props.deletePost(id);
+    };
 
     // Handle voting on a post.
     handlePostVote = (e, postId, type) => {
@@ -121,22 +126,29 @@ class Posts extends React.Component {
                     selection
                     search
                     options={sortedCategoryNames}
-                    onChange={(event, data)=> history.push(data.value)}
+                    onChange={(event, data) => history.push(data.value)}
                 />
             )}/>
         )
     };
 
     //
-    cardExtras = (voteScore, id, votedOn) => {
+    cardExtras = (voteScore, id, votedOn, commentCount) => {
         const alreadyVoted = votedOn ? VoteTypes.Decrement : VoteTypes.Increment;
         return (
             <Grid>
-                <Grid.Row columns={1}>
+                <Grid.Row columns={3}>
                     <Grid.Column>
                         <Icon name={alreadyVoted ? "star" : "empty start"}
                               onClick={(e) => this.handlePostVote(e, id, alreadyVoted)}/>
                         {voteScore}
+                    </Grid.Column>
+                    <Grid.Column>
+                        <Icon name='comments'/>
+                        {commentCount}
+                    </Grid.Column>
+                    <Grid.Column onClick={() => this.handleDeletePost(id)}>
+                        <Icon name='delete'/>
                     </Grid.Column>
                 </Grid.Row>
             </Grid>
@@ -150,7 +162,7 @@ class Posts extends React.Component {
         // TODO: clean this up - interesting idea but not complete.
         post["votedOn"] = post.votedOn !== null ? post.votedOn : false;
 
-        const {title, author, body, timestamp, id, voteScore, votedOn} = post;
+        const {title, author, body, timestamp, id, voteScore, votedOn, commentCount} = post;
         const dateOfPost = moment(parseInt(timestamp, 10)).format('MMMM Do YYYY').toString();
         const meta = `${author} - ${dateOfPost}`;
         const header = () => <Link to={`/post/${id}`}>{title}</Link>;
@@ -160,7 +172,7 @@ class Posts extends React.Component {
             header={header()}
             meta={meta}
             description={body}
-            extra={this.cardExtras(voteScore, id, votedOn)}
+            extra={this.cardExtras(voteScore, id, votedOn, commentCount)}
             id={id}
             key={`post-${id}-${timestamp}`}
         />
@@ -221,4 +233,4 @@ const mapStateToProps = (state) => {
     }
 };
 
-export default connect(mapStateToProps, {requestPost, requestPostsForCategory, requestUpdatePost})(Posts)
+export default connect(mapStateToProps, {requestPost, requestPostsForCategory, requestUpdatePost, deletePost})(Posts)
