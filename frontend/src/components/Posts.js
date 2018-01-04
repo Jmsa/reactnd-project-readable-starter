@@ -46,6 +46,13 @@ class Posts extends React.Component {
         }
     }
 
+    // Handle editing a post
+    handleEditPost = (id) => {
+        const {history} = this.props;
+        this.setState({editingPost: true});
+        history.push(`/post/${id}`);
+    };
+
     // Handle deleting a post
     handleDeletePost = (id) => {
         this.props.deletePost(id);
@@ -137,18 +144,27 @@ class Posts extends React.Component {
         const alreadyVoted = votedOn ? VoteTypes.Decrement : VoteTypes.Increment;
         return (
             <Grid>
-                <Grid.Row columns={3}>
+                <Grid.Row columns={4}>
                     <Grid.Column>
-                        <Icon name={alreadyVoted ? "star" : "empty start"}
-                              onClick={(e) => this.handlePostVote(e, id, alreadyVoted)}/>
+                        <Icon name="arrow up"
+                              onClick={(e) => this.handlePostVote(e, id, VoteTypes.Increment)}
+                              title='up vote'
+                        />
+                        <Icon name="arrow down"
+                              onClick={(e) => this.handlePostVote(e, id, VoteTypes.Decrement)}
+                              title='down vote'
+                        />
                         {voteScore}
                     </Grid.Column>
                     <Grid.Column>
-                        <Icon name='comments'/>
+                        <Icon name='comments' title='number of comments'/>
                         {commentCount}
                     </Grid.Column>
-                    <Grid.Column onClick={() => this.handleDeletePost(id)}>
-                        <Icon name='delete'/>
+                    <Grid.Column>
+                        <Icon name='edit' title='edit' onClick={() => this.handleEditPost(id)}/>
+                    </Grid.Column>
+                    <Grid.Column>
+                        <Icon name='delete' title='delete' onClick={() => this.handleDeletePost(id)}/>
                     </Grid.Column>
                 </Grid.Row>
             </Grid>

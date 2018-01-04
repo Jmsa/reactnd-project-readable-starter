@@ -28,6 +28,7 @@ const initialState = {
     comments: {},
     currentPost: {},
     editingComment: null,
+    editingPost: false
 };
 let store = createStore(
     reducer,

@@ -13,7 +13,6 @@ export class Post extends React.Component {
     // Keep a small amount of local state
     state = {
         loading: true,
-        editing: false,
         comments: []
     };
 
@@ -57,7 +56,7 @@ export class Post extends React.Component {
         };
 
         this.props.updatePost(post);
-        this.setState({editing: false})
+        this.setState({editingPost: false})
     };
 
     // Handle deleting the post.
@@ -92,7 +91,7 @@ export class Post extends React.Component {
                                     </Item.Header>
                                     <Item.Meta>{meta}</Item.Meta>
                                     <Item.Extra>
-                                        <span onClick={() => this.setState({editing: true})}>
+                                        <span onClick={() => this.setState({editingPost: true})}>
                                             <Icon name="edit"/>
                                             Edit
                                         </span>
@@ -123,7 +122,7 @@ export class Post extends React.Component {
                 <Form.Field control={TextArea} defaultValue={body} label="Body" name="body"
                             placeholder="Post content..."/>
                 <Button.Group>
-                    <Button onClick={() => this.setState({editing: false})}>Cancel</Button>
+                    <Button onClick={() => this.setState({editingPost: false})}>Cancel</Button>
                     <Button.Or/>
                     <Button positive>Save</Button>
                 </Button.Group>
@@ -134,12 +133,12 @@ export class Post extends React.Component {
     // Define what a post looks like.
     postUI = () => {
         const {title, author, body, timestamp, id, voteScore} = this.props.post;
-        const {editing} = this.state;
+        const {editingPost} = this.state;
         const dateOfPost = moment(timestamp).format('MMMM Do YYYY').toString();
         const meta = `${author} - ${dateOfPost}`;
 
         // Determine which ui to show.
-        const display = editing ? this.editingPostUI(title, body) : this.staticPostUI(id, title, meta, voteScore, body);
+        const display = editingPost ? this.editingPostUI(title, body) : this.staticPostUI(id, title, meta, voteScore, body);
 
         return (
             <div>
