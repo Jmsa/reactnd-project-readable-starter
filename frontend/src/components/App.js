@@ -21,9 +21,9 @@ export class App extends Component {
                 <Router>
                     <div>
                         <Navigation/>
-                        <Route path="/post/:id" component={Post}/>
                         <Route path="/newPost" component={NewPost}/>
-                        <Route path="/posts/:category" component={Posts}/>
+                        <Route exact path="/posts/:category" component={Posts}/>
+                        <Route exact path="/posts/:category/:id" component={Post}/>
                         <Route exact path="/" render={() => (
                             <Redirect to="/posts/all"/>
                         )}/>

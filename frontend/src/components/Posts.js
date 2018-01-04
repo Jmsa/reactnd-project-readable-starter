@@ -172,10 +172,10 @@ class Posts extends React.Component {
         // TODO: clean this up - interesting idea but not complete.
         post["votedOn"] = post.votedOn !== null ? post.votedOn : false;
 
-        const {title, author, body, timestamp, id, voteScore, votedOn, commentCount} = post;
+        const {title, author, body, timestamp, id, voteScore, votedOn, commentCount, category} = post;
         const dateOfPost = moment(parseInt(timestamp, 10)).format('MMMM Do YYYY').toString();
         const meta = `${author} - ${dateOfPost}`;
-        const header = () => <Link to={`/post/${id}`}>{title}</Link>;
+        const header = () => <Link to={`/posts/${category}/${id}`}>{title}</Link>;
 
         return <Card
             color={getRandomNamedColor()}
